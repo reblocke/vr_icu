@@ -39,7 +39,6 @@ import excel "ICU_selection_database.xlsx", sheet("data") firstrow case(lower)
 drop if missing(consented)
 generate id = _n
 
-//replace patient_id = "ICU_M_"+str(id) if missing(patient_id)
 replace patient_id = "ICU_M_" + string(id, "%12.0g") if patient_id == ""
 
 merge 1:1 patient_id using "patient_db", update generate(_merge_data)
@@ -61,7 +60,7 @@ label variable consent "Consented?"
 drop consented
 
 
-/* TODO: fix this if study date used for anything in the analysis; just string for now.
+/* Note - fix this if study date used for anything in the analysis; just string for now.
 generate study_date = date(date, "DMY")
 format study_date %td
 */ 
@@ -509,6 +508,70 @@ graph combine VAS_q1_combined.gph VAS_q2_combined.gph VAS_q3_combined.gph, ///
 	title("") ///
 	xsize(12) ysize(7)
 graph export "Results and Figures/$S_DATE/VAS q1-3 combined.png", as(png) width(3600) name("Graph") replace
-	
-	
+
    
+/* Separate Spreadsheet (not patient indexed) that contains HR data */ 
+clear    
+import excel "hr_data.xlsx", sheet("Sheet1") firstrow case(lower)
+label variable pre_hrv "HRV (pre)"
+label variable end_hrv "HRV (end)"
+label variable pre_hr "Mean HR (pre)"
+label variable end_hr "End HR (pre)"
+
+//Baseline and Follow-up HR data.
+sum pre_hrv, detail
+sum end_hrv, detail
+sum pre_hr, detail
+sum end_hr, detail
+
+
+//n=17 with complete data
+ttest pre_hrv == end_hrv // P = .008
+ttest pre_hr == end_hr // P = .0079 
+
+gen change_hrv = end_hrv - pre_hrv
+gen change_hr = end_hr - pre_hr 
+
+hist change_hrv
+summ change_hrv, detail
+hist change_hr
+summ change_hr, detail
+
+rename pre_hrv hrv_1
+rename end_hrv hrv_2 
+rename pre_hr hr_1
+rename end_hr hr_2 
+
+gen pre = 1
+label variable pre "Pre"
+gen post = 2 
+label variable post "End"
+
+
+//Individual Patient Visualizations
+
+/* HR Mean */
+twoway pcspike hr_1 pre hr_2 post, /// 
+	lpattern(longdash) lcolor(dkorange%70) lwidth(medthick) ///
+	ylabel(0(10)110, labsize(medlarge)) ///
+	xlabel(1 "Pre" 2 "Post", labsize(large)) ///
+	title("") ///
+	ytitle("Individual Patients", size(large)) ///
+	xtitle("") ///
+	ytitle("Heart Rate", size(large)) ///
+	title("Heart Rate (mean)", size(vlarge)) subtitle("Before VR to End of VR", size(large))
+graph export "Results and Figures/$S_DATE/HR pre-post indiv.png", as(png) name("Graph") replace
+
+/* HR Mean */
+twoway pcspike hrv_1 pre hrv_2 post, /// 
+	lpattern(longdash) lcolor(eltgreen) lwidth(medthick) ///
+	ylabel(0(10)90, labsize(medlarge)) ///
+	xlabel(1 "Pre" 2 "Post", labsize(large)) ///
+	title("") ///
+	ytitle("Individual Patients", size(large)) ///
+	xtitle("") ///
+	ytitle("Baevsky's Stress Index", size(large)) ///
+	title("Heart Rate Variability", size(vlarge)) subtitle("Before VR to End of VR", size(large))
+graph export "Results and Figures/$S_DATE/HRV pre-post indiv.png", as(png) name("Graph") replace
+
+
