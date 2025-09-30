@@ -1,0 +1,60 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using the metadata below."
+title: "vr_icu — Analysis and materials for 'Immersive Virtual Reality Use in Medical Intensive Care: Mixed Methods Feasibility Study'"
+type: software
+authors:
+  - family-names: Locke
+    given-names: Brian W.
+    affiliation: "Intermountain Health; University of Utah"
+  - family-names: Tsai
+    given-names: Te-Yi
+    affiliation: "University of Utah"
+  - family-names: Reategui-Rivera
+    given-names: C. Mahony
+    affiliation: "University of Utah"
+  - family-names: Gabriel
+    given-names: Aileen S.
+    affiliation: "University of Utah"
+  - family-names: Smiley
+    given-names: Aref
+    affiliation: "University of Utah"
+  - family-names: Finkelstein
+    given-names: Joseph
+    affiliation: "University of Utah"
+abstract: >
+  Statistical processing and diagramming for the University of Utah immersive virtual reality feasibility study in the ICU
+  (JMIR Serious Games, 2024). Contains Stata scripts for pre/post analyses of mood, anxiety and pain, and a Quarto document
+  that renders the enrollment flow diagram. De-identified data are available upon IRB-approved request, as described in the paper.
+license: MIT
+repository-code: "https://github.com/reblocke/vr_icu"
+url: "https://games.jmir.org/2024/1/e62842/"
+keywords:
+  - intensive care unit
+  - virtual reality
+  - heart rate variability
+  - Stata
+  - Quarto
+preferred-citation:
+  type: article
+  title: "Immersive Virtual Reality Use in Medical Intensive Care: Mixed Methods Feasibility Study"
+  authors:
+    - family-names: Locke
+      given-names: Brian W.
+    - family-names: Tsai
+      given-names: Te-Yi
+    - family-names: Reategui-Rivera
+      given-names: C. Mahony
+    - family-names: Gabriel
+      given-names: Aileen S.
+    - family-names: Smiley
+      given-names: Aref
+    - family-names: Finkelstein
+      given-names: Joseph
+  journal: "JMIR Serious Games"
+  year: 2024
+  volume: "12"
+  issue: "1"
+  doi: "10.2196/62842"
+  url: "https://games.jmir.org/2024/1/e62842/"
+version: "0.1.0"
+date-released: "2025-09-30"
