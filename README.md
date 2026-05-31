@@ -144,3 +144,42 @@ This repository is released under the **MIT License** (see `LICENSE`).
 
 - **Maintainer:** Brian W. Locke, MD, MSc — `brian.locke@imail.org`  
 - **Issues:** please open a GitHub issue with a minimal reproducible example and your environment details (OS, Stata version, Quarto version).
+
+## LLM and Repository Readiness Notes
+
+### Description
+Immersive Virtual Reality Use in Medical Intensive Care: Mixed Methods Feasibility Study
+
+### Instructions
+Start with this README, then inspect the files listed under Repository Layout. For computational workflows, run commands from the repository root and avoid committing generated outputs unless a release explicitly calls for them.
+
+### Authors, Funding, and Acknowledgments
+Maintainer: Brian W. Locke (`@reblocke`, ORCID 0000-0002-3588-5238). Preserve any project-specific author, funding, and acknowledgment details already listed elsewhere in the repository or accompanying publication.
+
+### Repository Layout
+- `CITATION.cff`
+- `LICENSE`
+- `README.md`
+- `VR Consort Diagram.qmd`
+- `VR_ICU.do`
+
+### Data and Codebook
+Study materials and de-identified outputs only; confirm no participant identifiers
+
+### Workflow / Script Order
+stata-mp -b do "VR_ICU.do"
+
+### Dependencies / Environment
+Stata and repo README
+
+### Citation
+Preferred scholarly citation: https://doi.org/10.2196/62842. Cite this repository with the GitHub URL and the commit or release used.
+
+### License
+Repository license status: CHECK. See the root license file when present. Third-party and publisher materials remain under their original terms.
+
+### Manuscript Status
+No public manuscript Markdown audited yet; use DOI and repository materials pending accepted-version check Open-access JMIR article may be linkable; verify reuse before copying full text
+
+### Contact
+Maintainer: Brian W. Locke (`@reblocke`). Use GitHub issues or pull requests for repository-specific questions when the repository is public.
