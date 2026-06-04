@@ -1,0 +1,39 @@
+# reblocke/vr_icu
+
+Purpose: Stata and Quarto workflow for "Immersive Virtual Reality Use in Medical Intensive Care: Mixed Methods Feasibility Study."
+
+Canonical article records:
+- Final article: https://games.jmir.org/2024/1/e62842/
+- DOI: https://doi.org/10.2196/62842
+- PubMed: https://pubmed.ncbi.nlm.nih.gov/39046869/
+- PMCID: https://pmc.ncbi.nlm.nih.gov/articles/PMC11344185/
+- Preprint record: https://preprints.jmir.org/preprint/62842
+
+Repository:
+- GitHub: https://github.com/reblocke/vr_icu
+- Citation metadata: CITATION.cff
+- Human README: README.md
+- Agent instructions: AGENTS.md
+- Data dictionary: data_dictionary.md and data_dictionary.csv
+
+What is here:
+- VR_ICU.do: Stata 18 analysis script for restricted local study data.
+- VR Consort Diagram.qmd: Quarto document for the enrollment flow diagram.
+- data_dictionary.md and data_dictionary.csv: documentation for expected restricted inputs and derived variables.
+
+Restricted data:
+- Participant-level data are not public and are intentionally not committed.
+- Expected local input files are data/ICU_patient_database.xlsx, data/ICU_selection_database.xlsx, and data/hr_data.xlsx.
+- Data access follows the article data availability statement and requires IRB-approved request.
+
+How to run:
+- Main Stata command: stata-mp -b do VR_ICU.do
+- Optional explicit arguments: stata-mp -b do VR_ICU.do data outputs/stata
+- Quarto diagram command after Stata: quarto render "VR Consort Diagram.qmd"
+- Generated outputs go under outputs/stata/ and outputs/figures/.
+
+Machine-reader cautions:
+- Do not infer that local generated outputs are current unless produced by the current commit.
+- Do not add PHI, restricted data, credentials, private IRB materials, or publisher-formatted PDFs.
+- Link the final article, preprint, and PMC records; do not mirror full manuscript text here.
+- The preprint record is linked for provenance. The final peer-reviewed article is the preferred citation.

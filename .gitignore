@@ -1,0 +1,30 @@
+# Restricted local study data
+data/
+ICU_patient_database.xlsx
+ICU_selection_database.xlsx
+hr_data.xlsx
+
+# Generated analysis outputs
+outputs/
+Results and Figures/
+*.log
+*.smcl
+*.gph
+*.dta
+*.xlsx
+!data_dictionary.csv
+
+# Quarto/R render artifacts
+*_files/
+*.html
+*.pdf
+*.png
+.quarto/
+.Rproj.user/
+.Rhistory
+.RData
+
+# Local OS/editor artifacts
+.DS_Store
+Thumbs.db
+*.tmp

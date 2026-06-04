@@ -1,47 +1,62 @@
-
+version 18.0
 capture log close
 
 * Data processing
-clear
+clear all
 
-//Directory with code and data
-cd "/Users/blocke/Box Sync/Residency Personal Files/Scholarly Work/Locke Research Projects/VR in ICU/Data"
-//cd ""
+args input_dir output_dir
+if `"`input_dir'"' == "" local input_dir "data"
+if `"`output_dir'"' == "" local output_dir "outputs/stata"
 
-capture mkdir "Results and Figures"
-capture mkdir "Results and Figures/$S_DATE/" //make new folder for figure output if needed
-capture mkdir "Results and Figures/$S_DATE/Logs/" //new folder for stata logs
+foreach required_file in "ICU_patient_database.xlsx" "ICU_selection_database.xlsx" "hr_data.xlsx" {
+	capture confirm file "`input_dir'/`required_file'"
+	if _rc {
+		display as error "Required input file not found: `input_dir'/`required_file'"
+		display as error "Provide an IRB-approved local dataset under data/ or pass input and output directories:"
+		display as error `"stata-mp -b do VR_ICU.do data outputs/stata"'
+		exit 601
+	}
+}
+
+capture mkdir "outputs"
+capture mkdir "`output_dir'"
+local run_dir "`output_dir'/$S_DATE"
+local logs_dir "`run_dir'/Logs"
+capture mkdir "`run_dir'"
+capture mkdir "`logs_dir'"
 local a1=substr(c(current_time),1,2)
 local a2=substr(c(current_time),4,2)
 local a3=substr(c(current_time),7,2)
 local b = "VR_ICU.do" // do file name to copy logs
-copy "`b'" "Results and Figures/$S_DATE/Logs/(`a1'_`a2'_`a3')`b'"
+copy "`b'" "`logs_dir'/(`a1'_`a2'_`a3')`b'", replace
 
 set scheme cleanplots
 graph set window fontface "Times New Roman" 
 capture log close
-log using "Results and Figures/$S_DATE/Logs/temp.log", append
+log using "`logs_dir'/(`a1'_`a2'_`a3')VR_ICU.log", replace
+
+tempfile patient_db
 
 
 /* -----
 DATA CLEANING 
 -------*/ 
 
-import excel "ICU_patient_database.xlsx", sheet("data") firstrow case(lower)
+import excel "`input_dir'/ICU_patient_database.xlsx", sheet("data") firstrow case(lower)
 
 drop if missing(patient_id)
 generate id = _n
 
-save patient_db, replace
+save `patient_db', replace
 
 clear
-import excel "ICU_selection_database.xlsx", sheet("data") firstrow case(lower)
+import excel "`input_dir'/ICU_selection_database.xlsx", sheet("data") firstrow case(lower)
 drop if missing(consented)
 generate id = _n
 
 replace patient_id = "ICU_M_" + string(id, "%12.0g") if patient_id == ""
 
-merge 1:1 patient_id using "patient_db", update generate(_merge_data)
+merge 1:1 patient_id using `patient_db', update generate(_merge_data)
 
 
 label variable id "Patient ID"
@@ -283,7 +298,7 @@ eyeglasses cat %4.0f \ ///
 respiratory_supp cat %4.0f \ ///
 prior_vr bin %4.0f \ ///
 ) ///
-percent_n percsign("%") iqrmiddle(",") sdleft(" (±") sdright(")") onecol saving("Results and Figures/$S_DATE/All patients Demographics.xlsx", replace)
+percent_n percsign("%") iqrmiddle(",") sdleft(" (±") sdright(")") onecol saving("`run_dir'/All patients Demographics.xlsx", replace)
 
 
 table1_mc, by(participate) ///    
@@ -301,7 +316,7 @@ cirrhosis bin %4.0f \ ///
 malig bin %4.0f \ ///
 reason_admit cat %4.0f \ ///
 ) ///
-percent_n percsign("%") iqrmiddle(",") sdleft(" (±") sdright(")") onecol total(before) saving("Results and Figures/$S_DATE/All patients comorbs.xlsx", replace)
+percent_n percsign("%") iqrmiddle(",") sdleft(" (±") sdright(")") onecol total(before) saving("`run_dir'/All patients comorbs.xlsx", replace)
 
 
 table1_mc, by(participate) ///    // Make this consented once those ones are in
@@ -312,9 +327,9 @@ vr_category cat %4.0f \ ///
 vr_minutes contn %4.0f \ ///
 decline_reason cat %4.0f \ ///
 ) ///
-percent_n percsign("%") iqrmiddle(",") sdleft(" (±") sdright(")") onecol saving("Results and Figures/$S_DATE/All patients VR chars.xlsx", replace)
+percent_n percsign("%") iqrmiddle(",") sdleft(" (±") sdright(")") onecol saving("`run_dir'/All patients VR chars.xlsx", replace)
 
-save "db_for_consort", replace
+save "`output_dir'/db_for_consort.dta", replace
 
 
 //Baseline and Follow-up Visual-analog scores.
@@ -368,8 +383,8 @@ twoway pcspike vas_q1_1 pre vas_q1_2 post, ///
 	xtitle("") ///
 	text(1.6 1.05 "Worse", size(medlarge) color(gs8) placement(east)) ///
 	text(9.6 1.05 "Better", size(medlarge) color(gs8) placement(east))
-graph save "VAS_q1_pre-post_indiv.gph", replace
-graph export "Results and Figures/$S_DATE/VAS q1 pre-post indiv.png", as(png) name("Graph") replace
+graph save "`run_dir'/VAS_q1_pre-post_indiv.gph", replace
+graph export "`run_dir'/VAS q1 pre-post indiv.png", as(png) name("Graph") replace
 
 /* Anxiety */ 
 //title("How worried/anxious you feel at this moment?", size(vlarge)) subtitle("Individual Patient Ratings: Lower = Less Worried", size(large))
@@ -382,8 +397,8 @@ twoway pcspike vas_q2_1 pre vas_q2_2 post, ///
 	xtitle("") ///
 	text(1.6 1.05 "Less Anxious", size(medlarge) color(gs8) placement(east)) ///
 	text(9.6 1.05 "More Anxious", size(medlarge) color(gs8) placement(east))
-graph save "VAS_q2_pre-post_indiv.gph", replace
-graph export "Results and Figures/$S_DATE/VAS q2 pre-post indiv.png", as(png) name("Graph") replace
+graph save "`run_dir'/VAS_q2_pre-post_indiv.gph", replace
+graph export "`run_dir'/VAS q2 pre-post indiv.png", as(png) name("Graph") replace
 
 /* Pain */ 
 //title("HHow much Pain do you have at the moment?", size(vlarge)) subtitle("Individual Patient Ratings: Lower = Less Pain", size(large))
@@ -396,8 +411,8 @@ twoway pcspike vas_q3_1 pre vas_q3_2 post, ///
 	xtitle("") ///
 	text(1.6 1.05 "Less Pain", size(medlarge) color(gs8) placement(east)) ///
 	text(9.6 1.05 "More Pain", size(medlarge) color(gs8) placement(east))
-graph save "VAS_q3_pre-post_indiv.gph", replace
-graph export "Results and Figures/$S_DATE/VAS q3 pre-post indiv.png", as(png) name("Graph") replace
+graph save "`run_dir'/VAS_q3_pre-post_indiv.gph", replace
+graph export "`run_dir'/VAS q3 pre-post indiv.png", as(png) name("Graph") replace
 
 //Reshape to long data for pre-post means
 reshape long vas_q1_ vas_q2_ vas_q3_ eda_av_ ecg_av_ ppg_av_, i(patient_id) j(time)
@@ -416,7 +431,7 @@ eda_av cat %4.0f \ ///
 ecg_av cat %4.0f \ ///
 ppg_av cat %4.0f \ ///
 ) ///
-percent_n percsign("%") iqrmiddle(",") sdleft(" (±") sdright(")") onecol saving("Results and Figures/$S_DATE/All patients data quality.xlsx", replace)
+percent_n percsign("%") iqrmiddle(",") sdleft(" (±") sdright(")") onecol saving("`run_dir'/All patients data quality.xlsx", replace)
 
 //VAS 
 label variable vas_q1_ "How you feel at this moment? (1-10)"
@@ -441,16 +456,16 @@ graph twoway ///
 	text(4 1.5 "{it:P}=.002; mean improvement" "of 1.8 (0.65 - 3.0) points", size(large)) /// 
 	text(1.6 1.05 "Worse", size(medlarge) color(gs8) placement(east)) ///
 	text(9.6 1.05 "Better", size(medlarge) color(gs8) placement(east))
-graph save "VAS_q1_pre-post_mean.gph", replace
-graph export "Results and Figures/$S_DATE/VAS q1 pre-post mean.png", as(png) name("Graph") replace
+graph save "`run_dir'/VAS_q1_pre-post_mean.gph", replace
+graph export "`run_dir'/VAS q1 pre-post mean.png", as(png) name("Graph") replace
 
-graph combine VAS_q1_pre-post_indiv.gph VAS_q1_pre-post_mean.gph, ///
+graph combine "`run_dir'/VAS_q1_pre-post_indiv.gph" "`run_dir'/VAS_q1_pre-post_mean.gph", ///
 	xcommon col(1) ///
 	title("Overall", size(huge)) ///
 	subtitle("How do you feel at the moment?") ///
 	xsize(5) ysize(7)
-graph save "VAS_q1_combined.gph", replace
-graph export "Results and Figures/$S_DATE/VAS q1 pre-post combined.png", as(png) name("Graph") replace
+graph save "`run_dir'/VAS_q1_combined.gph", replace
+graph export "`run_dir'/VAS q1 pre-post combined.png", as(png) name("Graph") replace
 restore	
 	
 	
@@ -466,16 +481,16 @@ graph twoway ///
 	text(6.5 1.5 "{it:P}=.001; mean improvement" "of 1.7 (0.8 - 2.7) points", size(large)) ///
 	text(1.6 1.05 "Less Anxious", size(medlarge) color(gs8) placement(east)) ///
 	text(9.6 1.05 "More Anxious", size(medlarge) color(gs8) placement(east))
-graph save "VAS_q2_pre-post_mean.gph", replace
-graph export "Results and Figures/$S_DATE/VAS q2 pre-post mean.png", as(png) name("Graph") replace
+graph save "`run_dir'/VAS_q2_pre-post_mean.gph", replace
+graph export "`run_dir'/VAS q2 pre-post mean.png", as(png) name("Graph") replace
 
-graph combine VAS_q2_pre-post_indiv.gph VAS_q2_pre-post_mean.gph, ///
+graph combine "`run_dir'/VAS_q2_pre-post_indiv.gph" "`run_dir'/VAS_q2_pre-post_mean.gph", ///
 	xcommon col(1) ///
 	title("Anxiety", size(huge)) ///
 	subtitle("How worried/anxious do you feel at the moment?") ///
 	xsize(5) ysize(7)
-graph save "VAS_q2_combined.gph", replace
-graph export "Results and Figures/$S_DATE/VAS q2 pre-post combined.png", as(png) name("Graph") replace
+graph save "`run_dir'/VAS_q2_combined.gph", replace
+graph export "`run_dir'/VAS q2 pre-post combined.png", as(png) name("Graph") replace
 restore	
 		
 /* Pain */ 
@@ -490,29 +505,29 @@ graph twoway ///
 	text(6.5 1.5 "{it:P}=.003; mean improvement" "of 1.3 (0.53 - 2.1) points", size(medlarge)) ///
 	text(1.6 1.05 "Less Pain", size(medlarge) color(gs8) placement(east)) ///
 	text(9.6 1.05 "More Pain", size(medlarge) color(gs8) placement(east))
-graph save "VAS_q3_pre-post_mean.gph", replace
-graph export "Results and Figures/$S_DATE/VAS q3 pre-post mean.png", as(png) name("Graph") replace
+graph save "`run_dir'/VAS_q3_pre-post_mean.gph", replace
+graph export "`run_dir'/VAS q3 pre-post mean.png", as(png) name("Graph") replace
 
-graph combine VAS_q3_pre-post_indiv.gph VAS_q3_pre-post_mean.gph, ///
+graph combine "`run_dir'/VAS_q3_pre-post_indiv.gph" "`run_dir'/VAS_q3_pre-post_mean.gph", ///
 	xcommon col(1) ///
 	title("Pain", size(huge)) ///
 	subtitle("How much pain do you feel at the moment?") ///
 	xsize(5) ysize(7)
-graph save "VAS_q3_combined.gph", replace
-graph export "Results and Figures/$S_DATE/VAS q3 pre-post combined.png", as(png) name("Graph") replace
+graph save "`run_dir'/VAS_q3_combined.gph", replace
+graph export "`run_dir'/VAS q3 pre-post combined.png", as(png) name("Graph") replace
 restore	
 
 
-graph combine VAS_q1_combined.gph VAS_q2_combined.gph VAS_q3_combined.gph, ///
+graph combine "`run_dir'/VAS_q1_combined.gph" "`run_dir'/VAS_q2_combined.gph" "`run_dir'/VAS_q3_combined.gph", ///
 	cols(3) /// 
 	title("") ///
 	xsize(12) ysize(7)
-graph export "Results and Figures/$S_DATE/VAS q1-3 combined.png", as(png) width(3600) name("Graph") replace
+graph export "`run_dir'/VAS q1-3 combined.png", as(png) width(3600) name("Graph") replace
 
    
 /* Separate Spreadsheet (not patient indexed) that contains HR data */ 
 clear    
-import excel "hr_data.xlsx", sheet("Sheet1") firstrow case(lower)
+import excel "`input_dir'/hr_data.xlsx", sheet("Sheet1") firstrow case(lower)
 label variable pre_hrv "HRV (pre)"
 label variable end_hrv "HRV (end)"
 label variable pre_hr "Mean HR (pre)"
@@ -560,7 +575,7 @@ twoway pcspike hr_1 pre hr_2 post, ///
 	xtitle("") ///
 	ytitle("Heart Rate", size(large)) ///
 	title("Heart Rate (mean)", size(vlarge)) subtitle("Before VR to End of VR", size(large))
-graph export "Results and Figures/$S_DATE/HR pre-post indiv.png", as(png) name("Graph") replace
+graph export "`run_dir'/HR pre-post indiv.png", as(png) name("Graph") replace
 
 /* HR Mean */
 twoway pcspike hrv_1 pre hrv_2 post, /// 
@@ -571,7 +586,7 @@ twoway pcspike hrv_1 pre hrv_2 post, ///
 	ytitle("Individual Patients", size(large)) ///
 	xtitle("") ///
 	ytitle("Baevsky's Stress Index", size(large)) ///
-	title("Heart Rate Variability", size(vlarge)) subtitle("Before VR to End of VR", size(large))
-graph export "Results and Figures/$S_DATE/HRV pre-post indiv.png", as(png) name("Graph") replace
+title("Heart Rate Variability", size(vlarge)) subtitle("Before VR to End of VR", size(large))
+graph export "`run_dir'/HRV pre-post indiv.png", as(png) name("Graph") replace
 
-
+log close
