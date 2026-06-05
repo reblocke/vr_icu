@@ -1,7 +1,13 @@
 cff-version: 1.2.0
-message: "If you use this software, please cite it using the metadata below."
-title: "vr_icu — Analysis and materials for 'Immersive Virtual Reality Use in Medical Intensive Care: Mixed Methods Feasibility Study'"
+message: "If you use this repository, please cite the final article and the repository commit or release used."
+title: "vr_icu: Stata and Quarto workflow for immersive virtual reality in the ICU"
 type: software
+version: "0.2.0"
+date-released: "2026-06-04"
+abstract: "Stata and Quarto analysis workflow for a JMIR Serious Games mixed-methods feasibility study of immersive virtual reality use in medical intensive care."
+license: MIT
+repository-code: "https://github.com/reblocke/vr_icu"
+url: "https://github.com/reblocke/vr_icu"
 authors:
   - family-names: Locke
     given-names: Brian W.
@@ -21,19 +27,27 @@ authors:
   - family-names: Finkelstein
     given-names: Joseph
     affiliation: "University of Utah"
-abstract: >
-  Statistical processing and diagramming for the University of Utah immersive virtual reality feasibility study in the ICU
-  (JMIR Serious Games, 2024). Contains Stata scripts for pre/post analyses of mood, anxiety and pain, and a Quarto document
-  that renders the enrollment flow diagram. De-identified data are available upon IRB-approved request, as described in the paper.
-license: MIT
-repository-code: "https://github.com/reblocke/vr_icu"
-url: "https://games.jmir.org/2024/1/e62842/"
 keywords:
   - intensive care unit
   - virtual reality
   - heart rate variability
   - Stata
   - Quarto
+  - mixed methods
+  - feasibility study
+identifiers:
+  - type: doi
+    value: "10.2196/62842"
+    description: "Final article DOI"
+  - type: other
+    value: "39046869"
+    description: "PubMed PMID"
+  - type: other
+    value: "PMC11344185"
+    description: "PubMed Central PMCID"
+  - type: url
+    value: "https://preprints.jmir.org/preprint/62842"
+    description: "JMIR preprint record"
 preferred-citation:
   type: article
   title: "Immersive Virtual Reality Use in Medical Intensive Care: Mixed Methods Feasibility Study"
@@ -52,9 +66,8 @@ preferred-citation:
       given-names: Joseph
   journal: "JMIR Serious Games"
   year: 2024
+  date-published: "2024-08-09"
   volume: "12"
   issue: "1"
   doi: "10.2196/62842"
   url: "https://games.jmir.org/2024/1/e62842/"
-version: "0.1.0"
-date-released: "2025-09-30"
