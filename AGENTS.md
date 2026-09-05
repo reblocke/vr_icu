@@ -13,6 +13,7 @@ This public repository contains Stata and Quarto code for "Immersive Virtual Rea
 - Generated Stata and Quarto outputs belong under `outputs/` and should not be committed unless a release explicitly archives them.
 
 ## How to Orient Quickly
+Consult only the entries relevant to the requested edit or run.
 
 1. Read `README.md` for article links, data access, dependencies, and workflow.
 2. Read `llms.txt` for compact machine-readable repository orientation.
@@ -47,5 +48,5 @@ quarto render "VR Consort Diagram.qmd"
 - Confirm `README.md`, `llms.txt`, `AGENTS.md`, and `CITATION.cff` agree on DOI, PMID, PMCID, run paths, and data restrictions.
 - Search for hard-coded local absolute paths from personal workstations.
 - Confirm `.gitignore` catches restricted workbooks, derived `.dta` files, logs, generated figures/tables, and local OS artifacts.
-- If Stata is available, run a batch smoke check and inspect the log.
-- If Quarto dependencies and restricted data are available, render the diagram; otherwise document the missing dependency or data limitation.
+- For analysis/runner changes, perform applicable Stata verification within the authorized workflow. It requires a licensed runtime and the approved inputs; executable availability alone does not authorize a restricted-data run. Inspect generated logs and report unavailable data/package/runtime gates separately from static checks.
+- When the diagram or its inputs change, render it within the authorized data scope if Quarto dependencies and approved inputs are available; otherwise report the missing prerequisite.
